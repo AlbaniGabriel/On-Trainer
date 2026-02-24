@@ -17,17 +17,25 @@ Visualização do histórico de check-ins
 Requisitos Funcionais (RF)
 
 RF01 – O sistema deve permitir cadastro de usuário.
+
 RF02 – O sistema deve permitir login com e-mail e senha.
+
 RF03 – O usuário deve poder criar uma rotina de treino.
+
 RF04 – O usuário deve poder associar exercícios à rotina.
+
 RF05 – O usuário deve poder registrar check-in.
+
 RF06 – O sistema deve permitir visualizar histórico de check-ins.
 
 Requisitos Não Funcionais (RNF)
 
 RNF01 – O sistema deve ser acessível via navegador.
+
 RNF02 – O tempo de resposta deve ser inferior a 3 segundos.
+
 RNF03 – As senhas devem ser armazenadas de forma segura.
+
 RNF04 – A interface deve ser simples e intuitiva.
 
 Principais Tecnologias e Justificativas
