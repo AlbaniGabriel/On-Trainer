@@ -75,3 +75,79 @@ Desenvolvimento do frontend
 Criação das telas (cadastro, login, rotinas e check-in)
 Integração com a API
 Documentação do projeto
+
+FIGMA
+https://www.figma.com/design/iwhrNspDMjd0KwXAa3tgmk/On-Trainer?node-id=0-1&t=w1vWr8Wkpo04Hley-1
+
+Modelo C4
+
+1) Nível 1 — Diagrama de Contexto
+```mermaid
+flowchart TD
+    U[Usuário da Academia]
+    S[On-Trainer<br/>Sistema web para gerenciamento de rotinas de treino e registro de frequência em academias]
+ 
+    U -->|Usa via navegador<br/>Cadastro, login, criação de treinos e check-in| S
+```
+2) Nível 2 — Diagrama de Containers
+ ```mermaid
+flowchart TD
+    U[Usuário da Academia]
+    N[Navegador]
+    F[Frontend Web<br/>HTML, CSS e JavaScript<br/><br/>Responsável pela interface do usuário,<br/>formulários de cadastro/login,<br/>criação de treinos e histórico de check-ins]
+    B[Backend API<br/>Java + Spring Boot<br/><br/>Responsável por autenticação,<br/>gerenciamento de rotinas,<br/>associação de exercícios<br/>e registro de check-ins]
+    DB[(Banco de Dados<br/>MySQL<br/><br/>Armazena usuários,<br/>rotinas, exercícios e check-ins)]
+ 
+    U -->|Acessa o sistema| N
+    N -->|Renderiza interface| F
+    F -->|Requisições via API REST| B
+    B -->|Consultas e persistência SQL| DB
+```
+3) Nível 3 — Diagrama de Componentes do Backend
+
+ ```mermaid
+flowchart TD
+    subgraph Controllers["Camada de Controllers"]
+        AC["AuthController<br/>Responsável por cadastro e login"]
+        UC["UserController<br/>Responsável por dados do usuário"]
+        WC["WorkoutController<br/>Responsável por criar, editar e excluir treinos"]
+        EC["ExerciseController<br/>Responsável por gerenciar exercícios"]
+        CC["CheckinController<br/>Responsável por registrar check-in e consultar histórico"]
+    end
+ 
+    subgraph Services["Camada de Services"]
+        US["UserService<br/>Validação de usuário, senha e regras de autenticação"]
+        WS["WorkoutService<br/>Regras de negócio das rotinas de treino"]
+        ES["ExerciseService<br/>Regras de negócio dos exercícios"]
+        CS["CheckinService<br/>Registro e consulta de frequência"]
+    end
+ 
+    subgraph Repositories["Camada de Repositories"]
+        UR["UserRepository"]
+        WR["WorkoutRepository"]
+        ER["ExerciseRepository"]
+        CR["CheckinRepository"]
+    end
+ 
+    DB[("MySQL Database")]
+ 
+    AC --> US
+    UC --> US
+    WC --> WS
+    EC --> ES
+    CC --> CS
+ 
+    US --> UR
+    WS --> WR
+    WS --> UR
+    ES --> ER
+    ES --> WR
+    CS --> CR
+    CS --> UR
+ 
+    UR --> DB
+    WR --> DB
+    ER --> DB
+    CR --> DB
+```
+
