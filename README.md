@@ -77,7 +77,8 @@ Integração com a API
 Documentação do projeto
 
 FIGMA
-https://www.figma.com/design/iwhrNspDMjd0KwXAa3tgmk/On-Trainer?node-id=0-1&t=w1vWr8Wkpo04Hley-1
+
+https://www.figma.com/design/iwhrNspDMjd0KwXAa3tgmk/On-Trainer?node-id=0-1&t=z4CJK0AmPcUYQEhI-1
 
 Modelo C4
 
@@ -150,4 +151,75 @@ flowchart TD
     ER --> DB
     CR --> DB
 ```
+Banco de Dados por extenso, por conta de não ter conseguido dar commit
+
+CREATE DATABASE on_trainer;
+
+
+\c on_trainer;
+
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE workout_routines (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+);
+
+
+
+CREATE TABLE exercises (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    muscle_group VARCHAR(50)
+);
+
+
+
+CREATE TABLE routine_exercises (
+    id SERIAL PRIMARY KEY,
+    routine_id INT NOT NULL,
+    exercise_id INT NOT NULL,
+    sets INT,
+    reps INT,
+
+    CONSTRAINT fk_routine
+        FOREIGN KEY (routine_id)
+        REFERENCES workout_routines(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_exercise
+        FOREIGN KEY (exercise_id)
+        REFERENCES exercises(id)
+        ON DELETE CASCADE
+);
+
+
+
+CREATE TABLE checkins (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    checkin_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_checkin_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+);
+
 
