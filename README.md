@@ -90,100 +90,200 @@ O sistema proposto tem como objetivo permitir:
 ## Nível 1 — Diagrama de Contexto
 
 ```mermaid
-C4Context
- 
-    Person(usuario, "Usuário da Academia", "Frequentador da academia que cadastra rotinas, exercícios e registra check-ins.")
- 
-    System(sistemaAcademia, "Sistema de Gerenciamento de Academia", "Permite cadastro de usuários, login, criação de rotinas de treino, associação de exercícios e registro de check-ins.")
- 
- 
-    Rel(usuario, sistemaAcademia, "Cadastra-se, faz login, gerencia rotinas e registra check-ins", "HTTPS")
+    flowchart LR
+    usuario["<b>Usuário da Academia</b>
+    <i>[Pessoa]</i>
+
+    Frequentador que cadastra rotinas,
+    exercícios e registra check-ins."]
+
+    sistema["<b>Sistema de Gerenciamento de Academia</b>
+    <i>[Sistema de Software]</i>
+
+    Cadastro de usuários, login, criação de
+    rotinas de treino, associação de exercícios
+    e registro de check-ins."]
+
+    usuario -->|"Cadastra-se, gerencia rotinas
+    e registra check-ins
+    <i>[HTTPS]</i>"| sistema
+
+    classDef pessoa fill:#08427b,stroke:#052e56,stroke-width:2px,color:#ffffff
+    classDef sistema fill:#1168bd,stroke:#0b4884,stroke-width:2px,color:#ffffff
+
+    class usuario pessoa
+    class sistema sistema
 ```
 
 ## Nível 2: - Diagrama de Contêineres
 
 ```mermaid
-C4Container
- 
- 
-   Person(usuario, "Usuário da Academia", "Frequentador da academia.")
- 
-   System_Boundary(sistemaAcademia, "Sistema de Gerenciamento de Academia") {
-       Container(frontend, "Frontend Web", "HTML, CSS e JavaScript", "Interface do usuário acessível via navegador.")
-       Container(backend, "Backend API REST", "Java 17, Spring Boot", "Processa as regras de negócio e expõe endpoints REST.")
-       ContainerDb(bancoDados, "Banco de Dados", "PostgreSQL 15", "Armazena usuários, rotinas, exercícios e check-ins.")
-   }
- 
-   Rel(usuario, frontend, "Acessa pelo navegador", "HTTPS")
-   Rel(frontend, backend, "Consome endpoints REST", "JSON / HTTPS")
-   Rel(backend, bancoDados, "Lê e persiste dados", "JDBC / JPA")
+flowchart TB
+    usuario["<b>Usuário da Academia</b>
+    <i>[Pessoa]</i>
+
+    Frequentador da academia."]
+
+    subgraph sistema [Sistema de Gerenciamento de Academia]
+        direction TB
+        frontend["<b>Frontend Web</b>
+        <i>[HTML, CSS, JavaScript]</i>
+
+        Interface do usuário
+        acessível via navegador."]
+
+        backend["<b>Backend API REST</b>
+        <i>[Java 17, Spring Boot]</i>
+
+        Processa as regras de negócio
+        e expõe endpoints REST."]
+
+        bancoDados[("<b>Banco de Dados</b>
+        <i>[PostgreSQL 15]</i>
+
+        Armazena usuários, rotinas,
+        exercícios e check-ins.")]
+    end
+
+    usuario -->|"Acessa pelo navegador
+    [HTTPS]"| frontend
+    frontend -->|"Consome endpoints REST
+    [JSON / HTTPS]"| backend
+    backend -->|"Lê e persiste dados
+    [JDBC / JPA]"| bancoDados
+
+    classDef pessoa fill:#08427b,stroke:#052e56,stroke-width:2px,color:#ffffff
+    classDef container fill:#438dd5,stroke:#2e6295,stroke-width:2px,color:#ffffff
+
+    class usuario pessoa
+    class frontend,backend,bancoDados container
+
+    style sistema fill:none,stroke:#888888,stroke-width:2px,stroke-dasharray:5 5
 ```
 ## Nível 3: - Diagrama de Componentes
 
 ```mermaid
-C4Component
- 
- 
-    Person(usuario, "Usuário da Academia", "Frequentador da academia.")
-    Container(frontend, "Frontend Web", "HTML, CSS e JavaScript", "Interface web.")
-    ContainerDb(bancoDados, "Banco de Dados", "PostgreSQL 15", "Armazena todos os dados.")
- 
-    Container_Boundary(backend, "Backend API REST") {
-        Component(securityConfig, "Security Config", "Spring Security", "Configura autenticação JWT e controle de acesso.")
-        Component(jwtUtil, "JWT Util", "JJWT Library", "Gera e valida tokens JWT.")
- 
-        Component(authController, "Auth Controller", "REST Controller", "Endpoints POST /auth/register e POST /auth/login.")
-        Component(authService, "Auth Service", "Spring Service", "Lógica de cadastro, validação e geração de token.")
-        Component(passwordEncoder, "Password Encoder", "Spring Security", "Hash seguro de senhas com BCrypt.")
- 
-        Component(usuarioController, "Usuario Controller", "REST Controller", "Endpoint GET /usuarios/me.")
-        Component(usuarioService, "Usuario Service", "Spring Service", "Lógica de perfil do usuário.")
-        Component(usuarioRepository, "Usuario Repository", "Spring Data JPA", "Acesso à tabela usuarios.")
- 
-        Component(rotinaController, "Rotina Controller", "REST Controller", "Endpoints CRUD /rotinas.")
-        Component(rotinaService, "Rotina Service", "Spring Service", "Lógica de gerenciamento de rotinas.")
-        Component(rotinaRepository, "Rotina Repository", "Spring Data JPA", "Acesso à tabela rotinas.")
- 
-        Component(exercicioController, "Exercicio Controller", "REST Controller", "Endpoints CRUD /rotinas/{id}/exercicios.")
-        Component(exercicioService, "Exercicio Service", "Spring Service", "Lógica de associação de exercícios.")
-        Component(exercicioRepository, "Exercicio Repository", "Spring Data JPA", "Acesso à tabela exercicios.")
- 
-        Component(checkinController, "Checkin Controller", "REST Controller", "Endpoints POST /checkins e GET /checkins.")
-        Component(checkinService, "Checkin Service", "Spring Service", "Lógica de registro e histórico de check-ins.")
-        Component(checkinRepository, "Checkin Repository", "Spring Data JPA", "Acesso à tabela checkins.")
-    }
- 
-    Rel(frontend, authController, "POST /auth/register, POST /auth/login", "JSON / HTTPS")
-    Rel(frontend, usuarioController, "GET /usuarios/me", "JSON / HTTPS")
-    Rel(frontend, rotinaController, "CRUD /rotinas", "JSON / HTTPS")
-    Rel(frontend, exercicioController, "CRUD /rotinas/{id}/exercicios", "JSON / HTTPS")
-    Rel(frontend, checkinController, "POST e GET /checkins", "JSON / HTTPS")
- 
-    Rel(securityConfig, jwtUtil, "Valida token JWT")
-    Rel(authController, authService, "Delega cadastro e login")
-    Rel(authService, passwordEncoder, "Hash e verificação de senha")
-    Rel(authService, jwtUtil, "Gera token após autenticação")
-    Rel(authService, usuarioRepository, "Salva e consulta usuário")
- 
-    Rel(usuarioController, usuarioService, "Delega consulta de perfil")
-    Rel(usuarioService, usuarioRepository, "Consulta dados do usuário")
- 
-    Rel(rotinaController, rotinaService, "Delega CRUD de rotinas")
-    Rel(rotinaService, rotinaRepository, "Persiste e consulta rotinas")
-    Rel(rotinaService, usuarioRepository, "Verifica propriedade da rotina")
- 
-    Rel(exercicioController, exercicioService, "Delega gerenciamento de exercícios")
-    Rel(exercicioService, exercicioRepository, "Persiste e consulta exercícios")
-    Rel(exercicioService, rotinaRepository, "Verifica existência da rotina")
- 
-    Rel(checkinController, checkinService, "Delega registro e consulta")
-    Rel(checkinService, checkinRepository, "Persiste e consulta check-ins")
-    Rel(checkinService, usuarioRepository, "Associa check-in ao usuário")
- 
-    Rel(usuarioRepository, bancoDados, "Tabela usuarios", "JPA/JDBC")
-    Rel(rotinaRepository, bancoDados, "Tabela rotinas", "JPA/JDBC")
-    Rel(exercicioRepository, bancoDados, "Tabela exercicios", "JPA/JDBC")
-    Rel(checkinRepository, bancoDados, "Tabela checkins", "JPA/JDBC")
+flowchart TB
+    usuario["<b>Usuário da Academia</b>
+    <i>[Pessoa]</i>"]
+
+    frontend["<b>Frontend Web</b>
+    <i>[HTML, CSS, JavaScript]</i>"]
+
+    bancoDados[("<b>Banco de Dados</b>
+    <i>[PostgreSQL 15]</i>")]
+
+    subgraph backend [Backend API REST - Java 17 / Spring Boot]
+        direction TB
+
+        subgraph seg [Segurança]
+            direction TB
+            securityConfig["<b>Security Config</b>
+            <i>[Spring Security]</i>"]
+            jwtUtil["<b>JWT Util</b>
+            <i>[JJWT]</i>"]
+            passwordEncoder["<b>Password Encoder</b>
+            <i>[BCrypt]</i>"]
+        end
+
+        subgraph auth [Autenticação]
+            direction TB
+            authController["<b>Auth Controller</b>
+            <i>[REST Controller]</i>"]
+            authService["<b>Auth Service</b>
+            <i>[Spring Service]</i>"]
+        end
+
+        subgraph usr [Usuário]
+            direction TB
+            usuarioController["<b>Usuario Controller</b>
+            <i>[REST Controller]</i>"]
+            usuarioService["<b>Usuario Service</b>
+            <i>[Spring Service]</i>"]
+            usuarioRepository["<b>Usuario Repository</b>
+            <i>[Spring Data JPA]</i>"]
+        end
+
+        subgraph rot [Rotina]
+            direction TB
+            rotinaController["<b>Rotina Controller</b>
+            <i>[REST Controller]</i>"]
+            rotinaService["<b>Rotina Service</b>
+            <i>[Spring Service]</i>"]
+            rotinaRepository["<b>Rotina Repository</b>
+            <i>[Spring Data JPA]</i>"]
+        end
+
+        subgraph exe [Exercício]
+            direction TB
+            exercicioController["<b>Exercicio Controller</b>
+            <i>[REST Controller]</i>"]
+            exercicioService["<b>Exercicio Service</b>
+            <i>[Spring Service]</i>"]
+            exercicioRepository["<b>Exercicio Repository</b>
+            <i>[Spring Data JPA]</i>"]
+        end
+
+        subgraph chk [Check-in]
+            direction TB
+            checkinController["<b>Checkin Controller</b>
+            <i>[REST Controller]</i>"]
+            checkinService["<b>Checkin Service</b>
+            <i>[Spring Service]</i>"]
+            checkinRepository["<b>Checkin Repository</b>
+            <i>[Spring Data JPA]</i>"]
+        end
+    end
+
+    usuario -->|"[HTTPS]"| frontend
+    frontend -->|"/auth/register, /auth/login"| authController
+    frontend -->|"GET /usuarios/me"| usuarioController
+    frontend -->|"CRUD /rotinas"| rotinaController
+    frontend -->|"CRUD /exercicios"| exercicioController
+    frontend -->|"POST e GET /checkins"| checkinController
+
+    securityConfig -->|"valida token"| jwtUtil
+
+    authController --> authService
+    authService -->|"hash de senha"| passwordEncoder
+    authService -->|"gera token"| jwtUtil
+    authService --> usuarioRepository
+
+    usuarioController --> usuarioService
+    usuarioService --> usuarioRepository
+
+    rotinaController --> rotinaService
+    rotinaService --> rotinaRepository
+    rotinaService -.->|"verifica dono"| usuarioRepository
+
+    exercicioController --> exercicioService
+    exercicioService --> exercicioRepository
+    exercicioService -.->|"verifica rotina"| rotinaRepository
+
+    checkinController --> checkinService
+    checkinService --> checkinRepository
+    checkinService -.->|"associa usuário"| usuarioRepository
+
+    usuarioRepository -->|"JPA/JDBC"| bancoDados
+    rotinaRepository -->|"JPA/JDBC"| bancoDados
+    exercicioRepository -->|"JPA/JDBC"| bancoDados
+    checkinRepository -->|"JPA/JDBC"| bancoDados
+
+    classDef pessoa fill:#08427b,stroke:#052e56,stroke-width:2px,color:#ffffff
+    classDef container fill:#438dd5,stroke:#2e6295,stroke-width:2px,color:#ffffff
+    classDef component fill:#85bbf0,stroke:#5d82a8,stroke-width:1px,color:#000000
+
+    class usuario pessoa
+    class frontend,bancoDados container
+    class securityConfig,jwtUtil,passwordEncoder,authController,authService,usuarioController,usuarioService,usuarioRepository,rotinaController,rotinaService,rotinaRepository,exercicioController,exercicioService,exercicioRepository,checkinController,checkinService,checkinRepository component
+
+    style backend fill:none,stroke:#888888,stroke-width:2px,stroke-dasharray:5 5
+    style seg fill:none,stroke:#bbbbbb,stroke-width:1px
+    style auth fill:none,stroke:#bbbbbb,stroke-width:1px
+    style usr fill:none,stroke:#bbbbbb,stroke-width:1px
+    style rot fill:none,stroke:#bbbbbb,stroke-width:1px
+    style exe fill:none,stroke:#bbbbbb,stroke-width:1px
+    style chk fill:none,stroke:#bbbbbb,stroke-width:1px
 ```
 ## UML Banco de Dados 
 <img width="1408" height="768" alt="image" src="https://github.com/user-attachments/assets/207749ce-2f93-4d40-bbc3-7932b95f70de" />
